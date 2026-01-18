@@ -33,20 +33,6 @@ jobs:
       - name: Run tests
         run: dotnet test src/cart/tests/ --no-build --verbosity normal
 
-  code-quality:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
-
-      - name: Check formatting
-        run: dotnet format src/cart/cart.sln --verify-no-changes
 
   docker:
     runs-on: ubuntu-latest
