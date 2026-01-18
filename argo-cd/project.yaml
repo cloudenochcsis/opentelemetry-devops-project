@@ -1,0 +1,35 @@
+# ArgoCD Project for OpenTelemetry Demo
+# Optional: Defines project-level access controls
+
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: opentelemetry-demo
+  namespace: argocd
+spec:
+  description: OpenTelemetry Demo Microservices Project
+  
+  # Source repos allowed for this project
+  sourceRepos:
+    - https://github.com/cloudenochcsis/opentelemetry-k8s-manifests.git
+  
+  # Destination clusters and namespaces
+  destinations:
+    - namespace: otel-demo
+      server: https://kubernetes.default.svc
+    - namespace: otel-demo
+      server: '*'
+  
+  # Allow all cluster-scoped resources
+  clusterResourceWhitelist:
+    - group: ''
+      kind: Namespace
+    - group: 'rbac.authorization.k8s.io'
+      kind: ClusterRole
+    - group: 'rbac.authorization.k8s.io'
+      kind: ClusterRoleBinding
+  
+  # Allow all namespaced resources
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'

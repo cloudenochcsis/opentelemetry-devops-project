@@ -1,0 +1,32 @@
+# ArgoCD Applications for OpenTelemetry Demo
+# This Application deploys all microservices from the external manifests repo
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: opentelemetry-demo
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  
+  source:
+    repoURL: https://github.com/cloudenochcsis/opentelemetry-k8s-manifests.git
+    targetRevision: main
+    path: k8s-manifests
+    directory:
+      recurse: true  # Deploy all subdirectories (all services)
+      exclude: '{complete-deploy.yaml,ingress/**,frontendproxy/**}'  # Exclude duplicates and misc configs
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: otel-demo
+  
+  syncPolicy:
+    automated:
+      prune: true      # Delete resources when removed from Git
+      selfHeal: true   # Revert manual changes to match Git
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
