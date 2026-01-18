@@ -14,3 +14,5 @@ From the root directory, run:
 ```sh
 docker compose build payment
 ```
+
+<!-- CI test trigger - 2026-01-18T17:50 -->
