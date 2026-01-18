@@ -1,0 +1,96 @@
+# CI for Cart Service (.NET)
+
+name: cart-ci
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'src/cart/**'
+      - 'kubernetes/cart/**'
+      - '.github/workflows/cart-ci.yaml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore src/cart/cart.sln
+
+      - name: Build
+        run: dotnet build src/cart/cart.sln --no-restore
+
+      - name: Run tests
+        run: dotnet test src/cart/tests/ --no-build --verbosity normal
+
+  code-quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Check formatting
+        run: dotnet format src/cart/cart.sln --verify-no-changes
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./
+          file: src/cart/src/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/cart:${{ github.run_id }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: docker
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update image tag in Kubernetes manifest
+        run: |
+          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/cart:${{ github.run_id }}|" kubernetes/cart/deploy.yaml
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.email "cloudenochcsis@gmail.com"
+          git config --global user.name "Cloud Enoch"
+          git add kubernetes/cart/deploy.yaml
+          git commit -m "[CI]: Update cart image tag"
+          git push origin HEAD:main -f
