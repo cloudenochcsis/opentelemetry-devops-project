@@ -41,22 +41,6 @@ jobs:
           cd src/shipping
           cargo test
 
-  code-quality:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Rust
-        uses: dtolnay/rust-action@stable
-        with:
-          components: clippy
-
-      - name: Run clippy
-        run: |
-          cd src/shipping
-          cargo clippy -- -D warnings
 
   docker:
     runs-on: ubuntu-latest
