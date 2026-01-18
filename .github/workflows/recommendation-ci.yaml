@@ -52,7 +52,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: ./
+          context: src/recommendation
           file: src/recommendation/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/recommendation:${{ github.run_id }}
