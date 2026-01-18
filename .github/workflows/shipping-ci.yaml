@@ -1,0 +1,106 @@
+# CI for Shipping Service (Rust)
+
+name: shipping-ci
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'src/shipping/**'
+      - 'kubernetes/shipping/**'
+      - '.github/workflows/shipping-ci.yaml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-action@stable
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            src/shipping/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('src/shipping/Cargo.lock') }}
+
+      - name: Build
+        run: |
+          cd src/shipping
+          cargo build --release
+
+      - name: Run tests
+        run: |
+          cd src/shipping
+          cargo test
+
+  code-quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-action@stable
+        with:
+          components: clippy
+
+      - name: Run clippy
+        run: |
+          cd src/shipping
+          cargo clippy -- -D warnings
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./
+          file: src/shipping/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/shipping:${{ github.run_id }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: docker
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update image tag in Kubernetes manifest
+        run: |
+          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/shipping:${{ github.run_id }}|" kubernetes/shipping/deploy.yaml
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.email "cloudenochcsis@gmail.com"
+          git config --global user.name "Cloud Enoch"
+          git add kubernetes/shipping/deploy.yaml
+          git commit -m "[CI]: Update shipping image tag"
+          git push origin HEAD:main -f
