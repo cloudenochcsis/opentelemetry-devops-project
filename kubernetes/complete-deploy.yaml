@@ -664,6 +664,8 @@ spec:
               value: cumulative
             - name: CHECKOUT_SERVICE_PORT
               value: "8080"
+            - name: CHECKOUT_PORT
+              value: "8080"
             - name: CART_SERVICE_ADDR
               value: 'opentelemetry-demo-cartservice:8080'
             - name: CURRENCY_SERVICE_ADDR
@@ -1449,6 +1451,8 @@ spec:
               value: cumulative
             - name: PAYMENT_SERVICE_PORT
               value: "8080"
+            - name: PORT
+              value: "8080"
             - name: FLAGD_HOST
               value: 'opentelemetry-demo-flagd'
             - name: FLAGD_PORT
@@ -1647,7 +1651,7 @@ spec:
               value: cumulative
             - name: RECOMMENDATION_SERVICE_PORT
               value: "8080"
-            - name: PRODUCT_CATALOG_SERVICE_ADDR
+            - name: PRODUCT_CATALOG_ADDR
               value: 'opentelemetry-demo-productcatalogservice:8080'
             - name: OTEL_PYTHON_LOG_CORRELATION
               value: "true"
@@ -1713,6 +1717,8 @@ spec:
             - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
               value: cumulative
             - name: SHIPPING_SERVICE_PORT
+              value: "8080"
+            - name: SHIPPING_PORT
               value: "8080"
             - name: QUOTE_SERVICE_ADDR
               value: http://opentelemetry-demo-quoteservice:8080
