@@ -31,7 +31,7 @@ spec:
       serviceAccountName: opentelemetry-demo
       containers:
         - name: paymentservice
-          image: 'ghcr.io/open-telemetry/demo:1.12.0-paymentservice'
+          image: akpadetsi/payment:21120806889
           imagePullPolicy: IfNotPresent
           ports:
             
@@ -48,6 +48,8 @@ spec:
             - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
               value: cumulative
             - name: PAYMENT_SERVICE_PORT
+              value: "8080"
+            - name: PAYMENT_PORT
               value: "8080"
             - name: PORT
               value: "8080"

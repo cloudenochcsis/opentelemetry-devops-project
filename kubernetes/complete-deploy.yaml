@@ -461,7 +461,11 @@ spec:
           resources:
             limits:
               memory: 120Mi
-          volumeMounts:
+              cpu: 500m
+            requests:
+              memory: 120Mi
+              cpu: 100m
+          volumeMounts: []
       initContainers:
         - command:
           - sh
@@ -470,7 +474,7 @@ spec:
             for kafka; sleep 2; done;
           image: busybox:latest
           name: wait-for-kafka
-      volumes:
+          volumes: []
 ---
 # Source: opentelemetry-demo/templates/component.yaml
 apiVersion: apps/v1
@@ -535,8 +539,12 @@ spec:
           resources:
             limits:
               memory: 300Mi
-          volumeMounts:
-      volumes:
+              cpu: 500m
+            requests:
+              memory: 300Mi
+              cpu: 100m
+          volumeMounts: []
+      volumes: []
 ---
 # Source: opentelemetry-demo/templates/component.yaml
 apiVersion: apps/v1
@@ -603,7 +611,11 @@ spec:
           resources:
             limits:
               memory: 160Mi
-          volumeMounts:
+              cpu: 500m
+            requests:
+              memory: 160Mi
+              cpu: 100m
+          volumeMounts: []
       initContainers:
         - command:
           - sh
@@ -612,7 +624,7 @@ spec:
             for valkey; sleep 2; done;
           image: busybox:latest
           name: wait-for-valkey
-      volumes:
+          volumes: []
 ---
 # Source: opentelemetry-demo/templates/component.yaml
 apiVersion: apps/v1
@@ -668,6 +680,8 @@ spec:
               value: "8080"
             - name: CART_SERVICE_ADDR
               value: 'opentelemetry-demo-cartservice:8080'
+            - name: CART_ADDR
+              value: 'opentelemetry-demo-cartservice:8080'
             - name: CURRENCY_SERVICE_ADDR
               value: 'opentelemetry-demo-currencyservice:8080'
             - name: EMAIL_SERVICE_ADDR
@@ -676,7 +690,11 @@ spec:
               value: 'opentelemetry-demo-paymentservice:8080'
             - name: PRODUCT_CATALOG_SERVICE_ADDR
               value: 'opentelemetry-demo-productcatalogservice:8080'
+            - name: PRODUCT_CATALOG_ADDR
+              value: 'opentelemetry-demo-productcatalogservice:8080'
             - name: SHIPPING_SERVICE_ADDR
+              value: 'opentelemetry-demo-shippingservice:8080'
+            - name: SHIPPING_ADDR
               value: 'opentelemetry-demo-shippingservice:8080'
             - name: KAFKA_SERVICE_ADDR
               value: 'opentelemetry-demo-kafka:9092'
@@ -691,7 +709,11 @@ spec:
           resources:
             limits:
               memory: 20Mi
-          volumeMounts:
+              cpu: 500m
+            requests:
+              memory: 20Mi
+              cpu: 100m
+          volumeMounts: []
       initContainers:
         - command:
           - sh
@@ -700,7 +722,7 @@ spec:
             for kafka; sleep 2; done;
           image: busybox:latest
           name: wait-for-kafka
-      volumes:
+          volumes: []
 ---
 # Source: opentelemetry-demo/templates/component.yaml
 apiVersion: apps/v1
@@ -761,8 +783,12 @@ spec:
           resources:
             limits:
               memory: 20Mi
-          volumeMounts:
-      volumes:
+              cpu: 500m
+            requests:
+              memory: 20Mi
+              cpu: 100m
+          volumeMounts: []
+      volumes: []
 ---
 # Source: opentelemetry-demo/templates/component.yaml
 apiVersion: apps/v1
@@ -823,8 +849,12 @@ spec:
           resources:
             limits:
               memory: 100Mi
-          volumeMounts:
-      volumes:
+              cpu: 500m
+            requests:
+              memory: 100Mi
+              cpu: 100m
+          volumeMounts: []
+      volumes: []
 ---
 # Source: opentelemetry-demo/templates/component.yaml
 apiVersion: apps/v1
@@ -888,6 +918,10 @@ spec:
           resources:
             limits:
               memory: 75Mi
+              cpu: 500m
+            requests:
+              memory: 75Mi
+              cpu: 100m
           volumeMounts:
             - name: config-rw
               mountPath: /etc/flagd
@@ -917,6 +951,10 @@ spec:
           resources:
             limits:
               memory: 75Mi
+              cpu: 500m
+            requests:
+              memory: 75Mi
+              cpu: 100m
           volumeMounts:
             - mountPath: /app/data
               name: config-rw
@@ -996,7 +1034,11 @@ spec:
           resources:
             limits:
               memory: 300Mi
-          volumeMounts:
+              cpu: 500m
+            requests:
+              memory: 300Mi
+              cpu: 100m
+          volumeMounts: []
       initContainers:
         - command:
           - sh
@@ -1005,7 +1047,7 @@ spec:
             for kafka; sleep 2; done;
           image: busybox:latest
           name: wait-for-kafka
-      volumes:
+          volumes: []
 ---
 # Source: opentelemetry-demo/templates/component.yaml
 apiVersion: apps/v1
@@ -1090,12 +1132,16 @@ spec:
           resources:
             limits:
               memory: 250Mi
+              cpu: 500m
+            requests:
+              memory: 250Mi
+              cpu: 100m
           securityContext:
             runAsGroup: 1001
             runAsNonRoot: true
             runAsUser: 1001
-          volumeMounts:
-      volumes:
+          volumeMounts: []
+      volumes: []
 ---
 # Source: opentelemetry-demo/templates/component.yaml
 apiVersion: apps/v1
@@ -1186,12 +1232,16 @@ spec:
           resources:
             limits:
               memory: 50Mi
+              cpu: 500m
+            requests:
+              memory: 50Mi
+              cpu: 100m
           securityContext:
             runAsGroup: 101
             runAsNonRoot: true
             runAsUser: 101
-          volumeMounts:
-      volumes:
+          volumeMounts: []
+      volumes: []
 ---
 # Source: opentelemetry-demo/templates/component.yaml
 apiVersion: apps/v1
@@ -1252,8 +1302,12 @@ spec:
           resources:
             limits:
               memory: 50Mi
-          volumeMounts:
-      volumes:
+              cpu: 500m
+            requests:
+              memory: 50Mi
+              cpu: 100m
+          volumeMounts: []
+      volumes: []
 ---
 # Source: opentelemetry-demo/templates/component.yaml
 apiVersion: apps/v1
@@ -1316,12 +1370,16 @@ spec:
           resources:
             limits:
               memory: 600Mi
+              cpu: 500m
+            requests:
+              memory: 600Mi
+              cpu: 100m
           securityContext:
             runAsGroup: 1000
             runAsNonRoot: true
             runAsUser: 1000
-          volumeMounts:
-      volumes:
+          volumeMounts: []
+      volumes: []
 ---
 # Source: opentelemetry-demo/templates/component.yaml
 apiVersion: apps/v1
@@ -1398,8 +1456,12 @@ spec:
           resources:
             limits:
               memory: 1500Mi
-          volumeMounts:
-      volumes:
+              cpu: 500m
+            requests:
+              memory: 1500Mi
+              cpu: 100m
+          volumeMounts: []
+      volumes: []
 ---
 # Source: opentelemetry-demo/templates/component.yaml
 apiVersion: apps/v1
@@ -1451,6 +1513,8 @@ spec:
               value: cumulative
             - name: PAYMENT_SERVICE_PORT
               value: "8080"
+            - name: PAYMENT_PORT
+              value: "8080"
             - name: PORT
               value: "8080"
             - name: FLAGD_HOST
@@ -1464,12 +1528,16 @@ spec:
           resources:
             limits:
               memory: 120Mi
+              cpu: 500m
+            requests:
+              memory: 120Mi
+              cpu: 100m
           securityContext:
             runAsGroup: 1000
             runAsNonRoot: true
             runAsUser: 1000
-          volumeMounts:
-      volumes:
+          volumeMounts: []
+      volumes: []
 ---
 # Source: opentelemetry-demo/templates/component.yaml
 apiVersion: apps/v1
@@ -1532,8 +1600,12 @@ spec:
           resources:
             limits:
               memory: 20Mi
-          volumeMounts:
-      volumes:
+              cpu: 500m
+            requests:
+              memory: 20Mi
+              cpu: 100m
+          volumeMounts: []
+      volumes: []
 ---
 # Source: opentelemetry-demo/templates/component.yaml
 apiVersion: apps/v1
@@ -1594,12 +1666,16 @@ spec:
           resources:
             limits:
               memory: 40Mi
+              cpu: 500m
+            requests:
+              memory: 40Mi
+              cpu: 100m
           securityContext:
             runAsGroup: 33
             runAsNonRoot: true
             runAsUser: 33
-          volumeMounts:
-      volumes:
+          volumeMounts: []
+      volumes: []
 ---
 # Source: opentelemetry-demo/templates/component.yaml
 apiVersion: apps/v1
@@ -1668,8 +1744,12 @@ spec:
           resources:
             limits:
               memory: 500Mi
-          volumeMounts:
-      volumes:
+              cpu: 500m
+            requests:
+              memory: 500Mi
+              cpu: 100m
+          volumeMounts: []
+      volumes: []
 ---
 # Source: opentelemetry-demo/templates/component.yaml
 apiVersion: apps/v1
@@ -1729,8 +1809,12 @@ spec:
           resources:
             limits:
               memory: 20Mi
-          volumeMounts:
-      volumes:
+              cpu: 500m
+            requests:
+              memory: 20Mi
+              cpu: 100m
+          volumeMounts: []
+      volumes: []
 ---
 # Source: opentelemetry-demo/templates/component.yaml
 apiVersion: apps/v1
@@ -1784,12 +1868,16 @@ spec:
           resources:
             limits:
               memory: 20Mi
+              cpu: 500m
+            requests:
+              memory: 20Mi
+              cpu: 100m
           securityContext:
             runAsGroup: 1000
             runAsNonRoot: true
             runAsUser: 999
-          volumeMounts:
-      volumes:
+          volumeMounts: []
+      volumes: []
 ---
 # Source: opentelemetry-demo/templates/flagd-config.yaml
 apiVersion: v1
