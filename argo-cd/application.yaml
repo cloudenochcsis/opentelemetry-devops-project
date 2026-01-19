@@ -17,7 +17,7 @@ spec:
     path: k8s-manifests
     directory:
       recurse: true  # Deploy all subdirectories (all services)
-      exclude: '{complete-deploy.yaml,ingress/**,frontendproxy/**}'  # Exclude duplicates and misc configs
+      exclude: '{full-deployment.yaml,ingress/**,frontendproxy/**}'  # Exclude duplicates and misc configs
   
   destination:
     server: https://kubernetes.default.svc
