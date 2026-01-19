@@ -684,9 +684,15 @@ spec:
               value: 'opentelemetry-demo-cartservice:8080'
             - name: CURRENCY_SERVICE_ADDR
               value: 'opentelemetry-demo-currencyservice:8080'
+            - name: CURRENCY_ADDR
+              value: 'opentelemetry-demo-currencyservice:8080'
             - name: EMAIL_SERVICE_ADDR
               value: http://opentelemetry-demo-emailservice:8080
+            - name: EMAIL_ADDR
+              value: http://opentelemetry-demo-emailservice:8080
             - name: PAYMENT_SERVICE_ADDR
+              value: 'opentelemetry-demo-paymentservice:8080'
+            - name: PAYMENT_ADDR
               value: 'opentelemetry-demo-paymentservice:8080'
             - name: PRODUCT_CATALOG_SERVICE_ADDR
               value: 'opentelemetry-demo-productcatalogservice:8080'
@@ -697,6 +703,8 @@ spec:
             - name: SHIPPING_ADDR
               value: 'opentelemetry-demo-shippingservice:8080'
             - name: KAFKA_SERVICE_ADDR
+              value: 'opentelemetry-demo-kafka:9092'
+            - name: KAFKA_ADDR
               value: 'opentelemetry-demo-kafka:9092'
             - name: FLAGD_HOST
               value: 'opentelemetry-demo-flagd'
