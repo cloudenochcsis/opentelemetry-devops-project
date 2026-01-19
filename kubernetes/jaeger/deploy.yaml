@@ -1,0 +1,107 @@
+---
+# Jaeger - Distributed Tracing
+apiVersion: v1
+kind: Service
+metadata:
+  name: opentelemetry-demo-jaeger-collector
+  labels:
+    opentelemetry.io/name: opentelemetry-demo-jaeger
+    app.kubernetes.io/instance: opentelemetry-demo
+    app.kubernetes.io/component: jaeger
+    app.kubernetes.io/name: opentelemetry-demo-jaeger
+    app.kubernetes.io/part-of: opentelemetry-demo
+spec:
+  type: ClusterIP
+  ports:
+    - name: grpc-otlp
+      port: 4317
+      targetPort: 4317
+      protocol: TCP
+    - name: http-otlp
+      port: 4318
+      targetPort: 4318
+      protocol: TCP
+  selector:
+    opentelemetry.io/name: opentelemetry-demo-jaeger
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opentelemetry-demo-jaeger-query
+  labels:
+    opentelemetry.io/name: opentelemetry-demo-jaeger
+    app.kubernetes.io/instance: opentelemetry-demo
+    app.kubernetes.io/component: jaeger
+    app.kubernetes.io/name: opentelemetry-demo-jaeger
+    app.kubernetes.io/part-of: opentelemetry-demo
+spec:
+  type: ClusterIP
+  ports:
+    - name: http-query
+      port: 16686
+      targetPort: 16686
+      protocol: TCP
+  selector:
+    opentelemetry.io/name: opentelemetry-demo-jaeger
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opentelemetry-demo-jaeger
+  labels:
+    opentelemetry.io/name: opentelemetry-demo-jaeger
+    app.kubernetes.io/instance: opentelemetry-demo
+    app.kubernetes.io/component: jaeger
+    app.kubernetes.io/name: opentelemetry-demo-jaeger
+    app.kubernetes.io/part-of: opentelemetry-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      opentelemetry.io/name: opentelemetry-demo-jaeger
+  template:
+    metadata:
+      labels:
+        opentelemetry.io/name: opentelemetry-demo-jaeger
+        app.kubernetes.io/instance: opentelemetry-demo
+        app.kubernetes.io/component: jaeger
+        app.kubernetes.io/name: opentelemetry-demo-jaeger
+    spec:
+      serviceAccountName: opentelemetry-demo
+      containers:
+        - name: jaeger
+          image: jaegertracing/all-in-one:1.53
+          imagePullPolicy: IfNotPresent
+          args:
+            - --memory.max-traces=5000
+            - --query.base-path=/jaeger/ui
+            - --prometheus.server-url=http://opentelemetry-demo-prometheus-server:9090
+            - --prometheus.query.normalize-calls=true
+            - --prometheus.query.normalize-duration=true
+          env:
+            - name: METRICS_STORAGE_TYPE
+              value: prometheus
+            - name: COLLECTOR_OTLP_ENABLED
+              value: "true"
+          ports:
+            - containerPort: 4317
+              name: grpc-otlp
+              protocol: TCP
+            - containerPort: 4318
+              name: http-otlp
+              protocol: TCP
+            - containerPort: 16686
+              name: http-query
+              protocol: TCP
+          resources:
+            limits:
+              memory: 400Mi
+              cpu: 500m
+            requests:
+              memory: 200Mi
+              cpu: 100m
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 14269
+            initialDelaySeconds: 5
