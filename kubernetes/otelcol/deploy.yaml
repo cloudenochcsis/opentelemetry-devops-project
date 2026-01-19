@@ -1,0 +1,117 @@
+---
+# OpenTelemetry Collector - Central telemetry pipeline
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opentelemetry-demo-otelcol
+  labels:
+    opentelemetry.io/name: opentelemetry-demo-otelcol
+    app.kubernetes.io/instance: opentelemetry-demo
+    app.kubernetes.io/component: otelcol
+    app.kubernetes.io/name: opentelemetry-demo-otelcol
+    app.kubernetes.io/part-of: opentelemetry-demo
+data:
+  relay: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+            cors:
+              allowed_origins:
+                - "http://*"
+                - "https://*"
+
+    exporters:
+      debug: {}
+      otlp:
+        endpoint: opentelemetry-demo-jaeger-collector:4317
+        tls:
+          insecure: true
+      otlphttp/prometheus:
+        endpoint: http://opentelemetry-demo-prometheus-server:9090/api/v1/otlp
+        tls:
+          insecure: true
+
+    processors:
+      batch: {}
+      memory_limiter:
+        check_interval: 1s
+        limit_percentage: 65
+        spike_limit_percentage: 20
+
+    connectors:
+      spanmetrics: {}
+
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [otlp, debug, spanmetrics]
+        metrics:
+          receivers: [otlp, spanmetrics]
+          processors: [memory_limiter, batch]
+          exporters: [otlphttp/prometheus, debug]
+        logs:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [debug]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opentelemetry-demo-otelcol
+  labels:
+    opentelemetry.io/name: opentelemetry-demo-otelcol
+    app.kubernetes.io/instance: opentelemetry-demo
+    app.kubernetes.io/component: otelcol
+    app.kubernetes.io/name: opentelemetry-demo-otelcol
+    app.kubernetes.io/part-of: opentelemetry-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      opentelemetry.io/name: opentelemetry-demo-otelcol
+  template:
+    metadata:
+      labels:
+        opentelemetry.io/name: opentelemetry-demo-otelcol
+        app.kubernetes.io/instance: opentelemetry-demo
+        app.kubernetes.io/component: otelcol
+        app.kubernetes.io/name: opentelemetry-demo-otelcol
+    spec:
+      serviceAccountName: opentelemetry-demo
+      containers:
+        - name: otelcol
+          image: otel/opentelemetry-collector-contrib:0.96.0
+          imagePullPolicy: IfNotPresent
+          command:
+            - /otelcol-contrib
+            - --config=/conf/relay.yaml
+          ports:
+            - containerPort: 4317
+              name: grpc-otlp
+              protocol: TCP
+            - containerPort: 4318
+              name: http-otlp
+              protocol: TCP
+          volumeMounts:
+            - name: config
+              mountPath: /conf
+          resources:
+            limits:
+              memory: 200Mi
+              cpu: 500m
+            requests:
+              memory: 100Mi
+              cpu: 100m
+      volumes:
+        - name: config
+          configMap:
+            name: opentelemetry-demo-otelcol
+            items:
+              - key: relay
+                path: relay.yaml

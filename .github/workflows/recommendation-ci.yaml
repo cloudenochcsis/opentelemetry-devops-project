@@ -80,24 +80,24 @@ jobs:
           git commit -m "[CI]: Update recommendation image tag to ${{ github.run_id }}"
           git push origin HEAD:main -f
 
-      # Update manifests in the separate manifests repo
-      - name: Checkout manifests repo
-        uses: actions/checkout@v4
-        with:
-          repository: cloudenochcsis/opentelemetry-k8s-manifests
-          token: ${{ secrets.MANIFESTS_PAT }}
-          path: external-manifests
+      # DISABLED: External manifests repo update (using local manifests for testing)
+      # - name: Checkout manifests repo
+      #   uses: actions/checkout@v4
+      #   with:
+      #     repository: cloudenochcsis/opentelemetry-k8s-manifests
+      #     token: ${{ secrets.MANIFESTS_PAT }}
+      #     path: external-manifests
 
-      - name: Update tag in external manifests repo
-        run: |
-          cd external-manifests
-          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/recommendation:${{ github.run_id }}|" k8s-manifests/recommendation/deploy.yaml
+      # - name: Update tag in external manifests repo
+      #   run: |
+      #     cd external-manifests
+      #     sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/recommendation:${{ github.run_id }}|" k8s-manifests/recommendation/deploy.yaml
 
-      - name: Commit and push to manifests repo
-        run: |
-          cd external-manifests
-          git config --global user.email "cloudenochcsis@gmail.com"
-          git config --global user.name "Cloud Enoch"
-          git add k8s-manifests/recommendation/deploy.yaml
-          git commit -m "[CI]: Update recommendation image tag to ${{ github.run_id }}"
-          git push
+      # - name: Commit and push to manifests repo
+      #   run: |
+      #     cd external-manifests
+      #     git config --global user.email "cloudenochcsis@gmail.com"
+      #     git config --global user.name "Cloud Enoch"
+      #     git add k8s-manifests/recommendation/deploy.yaml
+      #     git commit -m "[CI]: Update recommendation image tag to ${{ github.run_id }}"
+      #     git push

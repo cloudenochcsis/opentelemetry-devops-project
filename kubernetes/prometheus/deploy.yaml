@@ -1,0 +1,97 @@
+---
+# Prometheus - Metrics Storage
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opentelemetry-demo-prometheus-server
+  labels:
+    opentelemetry.io/name: opentelemetry-demo-prometheus
+    app.kubernetes.io/instance: opentelemetry-demo
+    app.kubernetes.io/component: prometheus
+    app.kubernetes.io/name: opentelemetry-demo-prometheus
+    app.kubernetes.io/part-of: opentelemetry-demo
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+
+    scrape_configs:
+      - job_name: 'prometheus'
+        static_configs:
+          - targets: ['localhost:9090']
+
+      - job_name: 'otel-collector'
+        static_configs:
+          - targets: ['opentelemetry-demo-otelcol:8888']
+
+    # Enable OTLP receiver for metrics
+    otlp:
+      protocols:
+        http:
+          endpoint: 0.0.0.0:9090
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opentelemetry-demo-prometheus
+  labels:
+    opentelemetry.io/name: opentelemetry-demo-prometheus
+    app.kubernetes.io/instance: opentelemetry-demo
+    app.kubernetes.io/component: prometheus
+    app.kubernetes.io/name: opentelemetry-demo-prometheus
+    app.kubernetes.io/part-of: opentelemetry-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      opentelemetry.io/name: opentelemetry-demo-prometheus
+  template:
+    metadata:
+      labels:
+        opentelemetry.io/name: opentelemetry-demo-prometheus
+        app.kubernetes.io/instance: opentelemetry-demo
+        app.kubernetes.io/component: prometheus
+        app.kubernetes.io/name: opentelemetry-demo-prometheus
+    spec:
+      serviceAccountName: opentelemetry-demo
+      containers:
+        - name: prometheus
+          image: prom/prometheus:v2.49.1
+          imagePullPolicy: IfNotPresent
+          args:
+            - --config.file=/etc/prometheus/prometheus.yml
+            - --storage.tsdb.path=/prometheus
+            - --web.console.libraries=/usr/share/prometheus/console_libraries
+            - --web.console.templates=/usr/share/prometheus/consoles
+            - --web.enable-remote-write-receiver
+            - --web.enable-otlp-receiver
+            - --enable-feature=exemplar-storage
+            - --enable-feature=otlp-write-receiver
+          ports:
+            - containerPort: 9090
+              name: http
+              protocol: TCP
+          volumeMounts:
+            - name: config
+              mountPath: /etc/prometheus
+            - name: data
+              mountPath: /prometheus
+          resources:
+            limits:
+              memory: 400Mi
+              cpu: 500m
+            requests:
+              memory: 200Mi
+              cpu: 100m
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: 9090
+            initialDelaySeconds: 10
+      volumes:
+        - name: config
+          configMap:
+            name: opentelemetry-demo-prometheus-server
+        - name: data
+          emptyDir: {}

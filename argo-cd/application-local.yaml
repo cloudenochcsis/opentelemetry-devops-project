@@ -1,10 +1,11 @@
-# ArgoCD Applications for OpenTelemetry Demo
-# This Application deploys all microservices from the external manifests repo
+# ArgoCD Application - Local Manifests
+# This Application deploys all microservices from THIS repository's kubernetes folder
+# Use this when the external manifests repo is not synced with local changes
 
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: opentelemetry-demo
+  name: opentelemetry-demo-local
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -12,12 +13,13 @@ spec:
   project: default
   
   source:
-    repoURL: https://github.com/cloudenochcsis/opentelemetry-k8s-manifests.git
+    # Points to THIS repository instead of the external manifests repo
+    repoURL: https://github.com/cloudenochcsis/opentelemetry-devops-project.git
     targetRevision: main
-    path: k8s-manifests
+    path: kubernetes
     directory:
       recurse: true  # Deploy all subdirectories (all services)
-      exclude: '{full-deployment.yaml,ingress/**,frontendproxy/**}'  # Exclude duplicates and misc configs
+      exclude: '{full-deployment.yaml,ingress/**}'  # Exclude combined manifest and ingress
   
   destination:
     server: https://kubernetes.default.svc

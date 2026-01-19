@@ -1,0 +1,94 @@
+---
+# Grafana - Dashboards and Visualization
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opentelemetry-demo-grafana-datasources
+  labels:
+    opentelemetry.io/name: opentelemetry-demo-grafana
+    app.kubernetes.io/instance: opentelemetry-demo
+    app.kubernetes.io/component: grafana
+    app.kubernetes.io/name: opentelemetry-demo-grafana
+    app.kubernetes.io/part-of: opentelemetry-demo
+data:
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        uid: webstore-metrics
+        url: http://opentelemetry-demo-prometheus-server:9090
+        isDefault: true
+        editable: true
+      - name: Jaeger
+        type: jaeger
+        uid: webstore-traces
+        url: http://opentelemetry-demo-jaeger-query:16686
+        editable: true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opentelemetry-demo-grafana
+  labels:
+    opentelemetry.io/name: opentelemetry-demo-grafana
+    app.kubernetes.io/instance: opentelemetry-demo
+    app.kubernetes.io/component: grafana
+    app.kubernetes.io/name: opentelemetry-demo-grafana
+    app.kubernetes.io/part-of: opentelemetry-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      opentelemetry.io/name: opentelemetry-demo-grafana
+  template:
+    metadata:
+      labels:
+        opentelemetry.io/name: opentelemetry-demo-grafana
+        app.kubernetes.io/instance: opentelemetry-demo
+        app.kubernetes.io/component: grafana
+        app.kubernetes.io/name: opentelemetry-demo-grafana
+    spec:
+      serviceAccountName: opentelemetry-demo
+      containers:
+        - name: grafana
+          image: grafana/grafana:10.3.1
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: GF_SECURITY_ADMIN_USER
+              value: admin
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              value: admin
+            - name: GF_PATHS_PROVISIONING
+              value: /etc/grafana/provisioning
+            - name: GF_AUTH_ANONYMOUS_ENABLED
+              value: "true"
+            - name: GF_AUTH_ANONYMOUS_ORG_ROLE
+              value: Admin
+            - name: GF_SERVER_ROOT_URL
+              value: "%(protocol)s://%(domain)s:%(http_port)s/grafana"
+            - name: GF_SERVER_SERVE_FROM_SUB_PATH
+              value: "true"
+          ports:
+            - containerPort: 3000
+              name: http
+              protocol: TCP
+          volumeMounts:
+            - name: datasources
+              mountPath: /etc/grafana/provisioning/datasources
+          resources:
+            limits:
+              memory: 150Mi
+              cpu: 500m
+            requests:
+              memory: 100Mi
+              cpu: 100m
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 10
+      volumes:
+        - name: datasources
+          configMap:
+            name: opentelemetry-demo-grafana-datasources

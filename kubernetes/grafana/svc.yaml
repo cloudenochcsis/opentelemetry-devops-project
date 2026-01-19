@@ -1,0 +1,21 @@
+---
+# Grafana Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: opentelemetry-demo-grafana
+  labels:
+    opentelemetry.io/name: opentelemetry-demo-grafana
+    app.kubernetes.io/instance: opentelemetry-demo
+    app.kubernetes.io/component: grafana
+    app.kubernetes.io/name: opentelemetry-demo-grafana
+    app.kubernetes.io/part-of: opentelemetry-demo
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3000
+      protocol: TCP
+  selector:
+    opentelemetry.io/name: opentelemetry-demo-grafana
