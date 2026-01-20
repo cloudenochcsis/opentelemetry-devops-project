@@ -1,5 +1,4 @@
 # CI for Recommendation Service (Python)
-# Dummy change to trigger CI
 
 name: recommendation-ci
 

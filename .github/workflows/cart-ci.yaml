@@ -1,5 +1,4 @@
 # CI for Cart Service (.NET)
-# Dummy change to trigger CI
 
 name: cart-ci
 
