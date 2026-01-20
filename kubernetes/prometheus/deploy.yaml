@@ -72,7 +72,7 @@ spec:
               mountPath: /prometheus
           resources:
             limits:
-              memory: 400Mi
+              memory: 1Gi
               cpu: 500m
             requests:
               memory: 200Mi
