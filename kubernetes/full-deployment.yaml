@@ -1595,7 +1595,7 @@ spec:
               value: 'opentelemetry-demo-otelcol'
             - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
               value: cumulative
-            - name: PRODUCT_CATALOG_SERVICE_PORT
+            - name: PRODUCT_CATALOG_PORT
               value: "8080"
             - name: FLAGD_HOST
               value: 'opentelemetry-demo-flagd'
@@ -1733,7 +1733,7 @@ spec:
               value: 'opentelemetry-demo-otelcol'
             - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
               value: cumulative
-            - name: RECOMMENDATION_SERVICE_PORT
+            - name: RECOMMENDATION_PORT
               value: "8080"
             - name: PRODUCT_CATALOG_ADDR
               value: 'opentelemetry-demo-productcatalogservice:8080'
