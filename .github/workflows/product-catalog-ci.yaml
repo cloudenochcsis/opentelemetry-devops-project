@@ -1,5 +1,4 @@
 # CI for Product Catalog Service
-# Dummy change to trigger CI
 
 name: product-catalog-ci
 

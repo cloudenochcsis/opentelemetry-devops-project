@@ -1,5 +1,4 @@
 # CI for Frontend Service (Next.js)
-# Dummy change to trigger CI
 
 name: frontend-ci
 
