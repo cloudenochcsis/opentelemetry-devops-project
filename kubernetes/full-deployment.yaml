@@ -1810,6 +1810,8 @@ spec:
               value: "8080"
             - name: QUOTE_SERVICE_ADDR
               value: http://opentelemetry-demo-quoteservice:8080
+            - name: QUOTE_ADDR
+              value: http://opentelemetry-demo-quoteservice:8080
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: http://$(OTEL_COLLECTOR_NAME):4317
             - name: OTEL_RESOURCE_ATTRIBUTES
