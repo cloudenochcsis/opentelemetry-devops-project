@@ -1,4 +1,5 @@
 # CI for Shipping Service (Rust)
+# Dummy change to trigger CI
 
 name: shipping-ci
 
