@@ -24,12 +24,6 @@ data:
       - job_name: 'otel-collector'
         static_configs:
           - targets: ['opentelemetry-demo-otelcol:8888']
-
-    # Enable OTLP receiver for metrics
-    otlp:
-      protocols:
-        http:
-          endpoint: 0.0.0.0:9090
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -57,7 +51,7 @@ spec:
       serviceAccountName: opentelemetry-demo
       containers:
         - name: prometheus
-          image: prom/prometheus:v2.49.1
+          image: prom/prometheus:v3.5.0
           imagePullPolicy: IfNotPresent
           args:
             - --config.file=/etc/prometheus/prometheus.yml
@@ -67,7 +61,6 @@ spec:
             - --web.enable-remote-write-receiver
             - --web.enable-otlp-receiver
             - --enable-feature=exemplar-storage
-            - --enable-feature=otlp-write-receiver
           ports:
             - containerPort: 9090
               name: http
