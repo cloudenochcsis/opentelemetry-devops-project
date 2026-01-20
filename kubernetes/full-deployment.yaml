@@ -2096,7 +2096,7 @@ spec:
               cpu: 100m
           readinessProbe:
             httpGet:
-              path: /
+              path: /feature
               port: 4000
             initialDelaySeconds: 10
           volumeMounts:
@@ -2459,7 +2459,7 @@ spec:
               mountPath: /prometheus
           resources:
             limits:
-              memory: 400Mi
+              memory: 1Gi
               cpu: 500m
             requests:
               memory: 200Mi
