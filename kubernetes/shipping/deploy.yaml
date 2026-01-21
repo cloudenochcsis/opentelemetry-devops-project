@@ -28,7 +28,7 @@ spec:
       serviceAccountName: opentelemetry-demo
       containers:
         - name: shippingservice
-          image: akpadetsi/shipping:21191605909
+          image: akpadetsi/shipping:21220923881
           imagePullPolicy: IfNotPresent
           ports:
             
