@@ -2170,10 +2170,8 @@ data:
         endpoint: opentelemetry-demo-jaeger-collector:4317
         tls:
           insecure: true
-      otlphttp/prometheus:
-        endpoint: http://opentelemetry-demo-prometheus-server:9090/api/v1/otlp
-        tls:
-          insecure: true
+      prometheusremotewrite:
+        endpoint: http://opentelemetry-demo-prometheus-server:9090/api/v1/write
 
     processors:
       batch: {}
@@ -2194,7 +2192,7 @@ data:
         metrics:
           receivers: [otlp, spanmetrics]
           processors: [memory_limiter, batch]
-          exporters: [otlphttp/prometheus, debug]
+          exporters: [prometheusremotewrite, debug]
         logs:
           receivers: [otlp]
           processors: [memory_limiter, batch]
