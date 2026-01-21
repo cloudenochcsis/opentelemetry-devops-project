@@ -200,6 +200,8 @@ spec:
               mountPath: /etc/grafana/provisioning/dashboards
             - name: dashboards
               mountPath: /var/lib/grafana/dashboards
+            - name: demo-dashboards
+              mountPath: /var/lib/grafana/dashboards/demo
           resources:
             limits:
               memory: 150Mi
@@ -222,3 +224,6 @@ spec:
         - name: dashboards
           configMap:
             name: opentelemetry-demo-grafana-dashboards
+        - name: demo-dashboards
+          configMap:
+            name: opentelemetry-demo-grafana-demo-dashboards

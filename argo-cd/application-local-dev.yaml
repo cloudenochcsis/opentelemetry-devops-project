@@ -1,0 +1,32 @@
+# ArgoCD Application - Local Manifests (Dev)
+# Deploys this repo's kubernetes manifests from the feature branch into a dev namespace
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: opentelemetry-demo-local-dev
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/cloudenochcsis/opentelemetry-devops-project.git
+    targetRevision: feature/grafana-demo-dashboards
+    path: kubernetes
+    directory:
+      recurse: true
+      exclude: '{full-deployment.yaml,ingress/**,kube-state-metrics/**,node-exporter/**}'
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: otel-demo-dev
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
