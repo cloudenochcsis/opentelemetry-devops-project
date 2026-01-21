@@ -205,10 +205,10 @@ case $ACCESS_CHOICE in
             EXTERNAL_HOSTNAME=$(kubectl get svc opentelemetry-demo-frontendproxy -n otel-demo -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' 2>/dev/null)
             
             if [ -n "$EXTERNAL_IP" ]; then
-                BASE_URL="http://$EXTERNAL_IP"
+                BASE_URL="http://$EXTERNAL_IP:8080"
                 break
             elif [ -n "$EXTERNAL_HOSTNAME" ]; then
-                BASE_URL="http://$EXTERNAL_HOSTNAME"
+                BASE_URL="http://$EXTERNAL_HOSTNAME:8080"
                 break
             fi
             
