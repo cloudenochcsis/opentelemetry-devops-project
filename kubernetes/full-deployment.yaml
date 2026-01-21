@@ -2550,6 +2550,128 @@ data:
         url: http://opentelemetry-demo-jaeger-query:16686
         editable: true
 ---
+# Grafana - Dashboard Provisioning ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opentelemetry-demo-grafana-dashboard-provisioning
+  labels:
+    opentelemetry.io/name: opentelemetry-demo-grafana
+    app.kubernetes.io/instance: opentelemetry-demo
+    app.kubernetes.io/component: grafana
+    app.kubernetes.io/name: opentelemetry-demo-grafana
+    app.kubernetes.io/part-of: opentelemetry-demo
+data:
+  dashboards.yaml: |
+    apiVersion: 1
+    providers:
+      - name: 'kubernetes'
+        orgId: 1
+        folder: 'Kubernetes'
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards
+---
+# Grafana - Dashboards ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opentelemetry-demo-grafana-dashboards
+  labels:
+    opentelemetry.io/name: opentelemetry-demo-grafana
+    app.kubernetes.io/instance: opentelemetry-demo
+    app.kubernetes.io/component: grafana
+    app.kubernetes.io/name: opentelemetry-demo-grafana
+    app.kubernetes.io/part-of: opentelemetry-demo
+data:
+  kubernetes-overview.json: |
+    {
+      "uid": "k8s-overview",
+      "title": "Kubernetes Overview",
+      "schemaVersion": 38,
+      "version": 1,
+      "refresh": "30s",
+      "time": {"from": "now-15m", "to": "now"},
+      "panels": [
+        {
+          "type": "timeseries",
+          "title": "Pod Count",
+          "datasource": {"type": "prometheus", "uid": "webstore-metrics"},
+          "targets": [
+            {"expr": "count(kube_pod_info)", "legendFormat": "pods"}
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+        },
+        {
+          "type": "timeseries",
+          "title": "Node CPU Utilization",
+          "datasource": {"type": "prometheus", "uid": "webstore-metrics"},
+          "targets": [
+            {"expr": "avg(rate(node_cpu_seconds_total{mode!=\"idle\"}[5m])) by (instance)", "legendFormat": "{{instance}}"}
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+        },
+        {
+          "type": "timeseries",
+          "title": "Deployment Replicas (Desired)",
+          "datasource": {"type": "prometheus", "uid": "webstore-metrics"},
+          "targets": [
+            {"expr": "sum(kube_deployment_spec_replicas) by (namespace)", "legendFormat": "{{namespace}}"}
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+        },
+        {
+          "type": "timeseries",
+          "title": "Node Memory Utilization",
+          "datasource": {"type": "prometheus", "uid": "webstore-metrics"},
+          "targets": [
+            {"expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes))", "legendFormat": "{{instance}}"}
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+        }
+      ]
+    }
+  kubernetes-pods.json: |
+    {
+      "uid": "k8s-pods",
+      "title": "Kubernetes Pods",
+      "schemaVersion": 38,
+      "version": 1,
+      "refresh": "30s",
+      "time": {"from": "now-15m", "to": "now"},
+      "panels": [
+        {
+          "type": "timeseries",
+          "title": "Pods by Phase",
+          "datasource": {"type": "prometheus", "uid": "webstore-metrics"},
+          "targets": [
+            {"expr": "sum(kube_pod_status_phase) by (phase)", "legendFormat": "{{phase}}"}
+          ],
+          "gridPos": {"h": 8, "w": 24, "x": 0, "y": 0}
+        },
+        {
+          "type": "timeseries",
+          "title": "Pod Restarts (15m)",
+          "datasource": {"type": "prometheus", "uid": "webstore-metrics"},
+          "targets": [
+            {"expr": "sum(increase(kube_pod_container_status_restarts_total[15m])) by (namespace)", "legendFormat": "{{namespace}}"}
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+        },
+        {
+          "type": "timeseries",
+          "title": "Deployment Replicas (Available)",
+          "datasource": {"type": "prometheus", "uid": "webstore-metrics"},
+          "targets": [
+            {"expr": "sum(kube_deployment_status_replicas_available) by (namespace)", "legendFormat": "{{namespace}}"}
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+        }
+      ]
+    }
+---
 # Grafana - Deployment
 apiVersion: apps/v1
 kind: Deployment
@@ -2601,6 +2723,10 @@ spec:
           volumeMounts:
             - name: datasources
               mountPath: /etc/grafana/provisioning/datasources
+            - name: dashboard-provisioning
+              mountPath: /etc/grafana/provisioning/dashboards
+            - name: dashboards
+              mountPath: /var/lib/grafana/dashboards
           resources:
             limits:
               memory: 150Mi
@@ -2617,3 +2743,9 @@ spec:
         - name: datasources
           configMap:
             name: opentelemetry-demo-grafana-datasources
+        - name: dashboard-provisioning
+          configMap:
+            name: opentelemetry-demo-grafana-dashboard-provisioning
+        - name: dashboards
+          configMap:
+            name: opentelemetry-demo-grafana-dashboards
