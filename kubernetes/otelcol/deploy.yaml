@@ -75,6 +75,8 @@ spec:
       opentelemetry.io/name: opentelemetry-demo-otelcol
   template:
     metadata:
+      annotations:
+        opentelemetry-demo-otelcol-config-rev: "2026-01-21-1"
       labels:
         opentelemetry.io/name: opentelemetry-demo-otelcol
         app.kubernetes.io/instance: opentelemetry-demo
