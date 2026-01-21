@@ -21,5 +21,9 @@ spec:
       port: 4318
       targetPort: 4318
       protocol: TCP
+    - name: metrics
+      port: 8888
+      targetPort: 8888
+      protocol: TCP
   selector:
     opentelemetry.io/name: opentelemetry-demo-otelcol

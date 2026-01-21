@@ -2136,6 +2136,10 @@ spec:
       port: 4318
       targetPort: 4318
       protocol: TCP
+    - name: metrics
+      port: 8888
+      targetPort: 8888
+      protocol: TCP
   selector:
     opentelemetry.io/name: opentelemetry-demo-otelcol
 ---
@@ -2190,6 +2194,9 @@ data:
       spanmetrics: {}
 
     service:
+      telemetry:
+        metrics:
+          address: 0.0.0.0:8888
       pipelines:
         traces:
           receivers: [otlp]
@@ -2223,7 +2230,7 @@ spec:
   template:
     metadata:
       annotations:
-        opentelemetry-demo-otelcol-config-rev: "2026-01-21-1"
+        opentelemetry-demo-otelcol-config-rev: "2026-01-21-2"
       labels:
         opentelemetry.io/name: opentelemetry-demo-otelcol
         app.kubernetes.io/instance: opentelemetry-demo
@@ -2244,6 +2251,9 @@ spec:
               protocol: TCP
             - containerPort: 4318
               name: http-otlp
+              protocol: TCP
+            - containerPort: 8888
+              name: metrics
               protocol: TCP
           volumeMounts:
             - name: config
