@@ -138,7 +138,6 @@ case $ACCESS_CHOICE in
         
         print_info "Starting Frontend Proxy port forwarding on localhost:8088..."
         print_info "Also forwarding Prometheus directly on localhost:9090..."
-        print_info "Also forwarding Load Generator directly on localhost:8089..."
         print_info "Press Ctrl+C to stop"
         echo ""
         echo "=============================================="
@@ -150,8 +149,6 @@ case $ACCESS_CHOICE in
         echo "  Jaeger UI:        http://localhost:8088/jaeger/ui"
         echo "  Prometheus:       http://localhost:9090"
         echo "  Feature Flags:    http://localhost:8088/feature"
-        echo "  Load Generator:   http://localhost:8089"
-        echo "                   (Set Host to http://localhost:8088)"
         echo ""
         echo "=============================================="
         echo -e "  ${BLUE}Grafana Credentials:${NC}"
@@ -164,16 +161,11 @@ case $ACCESS_CHOICE in
         kubectl port-forward svc/opentelemetry-demo-prometheus-server -n otel-demo 9090:9090 &>/dev/null &
         PROM_PID=$!
 
-        # Start Load Generator port forward in background
-        kubectl port-forward svc/opentelemetry-demo-loadgenerator -n otel-demo 8089:8089 &>/dev/null &
-        LOADGEN_PID=$!
-        
         # Cleanup function
         cleanup() {
             echo ""
             print_info "Stopping port forwards..."
             kill $PROM_PID 2>/dev/null || true
-            kill $LOADGEN_PID 2>/dev/null || true
             exit 0
         }
         trap cleanup SIGINT SIGTERM
@@ -231,7 +223,6 @@ case $ACCESS_CHOICE in
             echo "  Jaeger UI:        $BASE_URL/jaeger/ui"
             echo "  Prometheus:       (use port-forward: kubectl port-forward svc/opentelemetry-demo-prometheus-server -n otel-demo 9090:9090)"
             echo "  Feature Flags:    $BASE_URL/feature"
-            echo "  Load Generator:   $BASE_URL/loadgen"
             echo ""
             echo "=============================================="
             echo -e "  ${BLUE}Grafana Credentials:${NC}"
@@ -377,7 +368,6 @@ case $ACCESS_CHOICE in
         echo "  Jaeger UI:        http://localhost:8088/jaeger/ui"
         echo "  Prometheus:       http://localhost:9090 (requires separate port-forward)"
         echo "  Feature Flags:    http://localhost:8088/feature"
-        echo "  Load Generator:   http://localhost:8088/loadgen"
         echo ""
         echo "=============================================="
         echo -e "  ${BLUE}Grafana Credentials:${NC}"

@@ -35,6 +35,7 @@ print_error() {
 # Confirm before proceeding
 echo "This script will remove:"
 echo "  - ArgoCD Application (opentelemetry-demo)"
+echo "  - LoadBalancer services (otel-demo and argocd)"
 echo "  - otel-demo namespace and all resources"
 echo "  - Ingress in default namespace"
 echo "  - cert-manager (optional)"
@@ -68,10 +69,32 @@ else
 fi
 
 # ============================================================================
-# 2. Remove otel-demo namespace
+# 2. Remove LoadBalancer services
 # ============================================================================
 echo ""
-echo "Step 2: Removing otel-demo namespace..."
+echo "Step 2: Removing LoadBalancer services..."
+
+LB_SERVICES_OTELOUT=$(kubectl get svc -n otel-demo --field-selector spec.type=LoadBalancer -o name 2>/dev/null || true)
+if [ -n "$LB_SERVICES_OTELOUT" ]; then
+    echo "$LB_SERVICES_OTELOUT" | xargs -r kubectl delete -n otel-demo 2>/dev/null || true
+    print_status "LoadBalancer services removed from otel-demo"
+else
+    print_warning "No LoadBalancer services found in otel-demo"
+fi
+
+LB_SERVICES_ARGO=$(kubectl get svc -n argocd --field-selector spec.type=LoadBalancer -o name 2>/dev/null || true)
+if [ -n "$LB_SERVICES_ARGO" ]; then
+    echo "$LB_SERVICES_ARGO" | xargs -r kubectl delete -n argocd 2>/dev/null || true
+    print_status "LoadBalancer services removed from argocd"
+else
+    print_warning "No LoadBalancer services found in argocd"
+fi
+
+# ==========================================================================
+# 3. Remove otel-demo namespace
+# ============================================================================
+echo ""
+echo "Step 3: Removing otel-demo namespace..."
 if kubectl get namespace otel-demo &>/dev/null; then
     kubectl delete all --all -n otel-demo --timeout=120s 2>/dev/null || true
     kubectl delete configmap --all -n otel-demo 2>/dev/null || true
@@ -85,10 +108,10 @@ else
 fi
 
 # ============================================================================
-# 3. Remove Ingress from default namespace
+# 4. Remove Ingress from default namespace
 # ============================================================================
 echo ""
-echo "Step 3: Removing Ingress from default namespace..."
+echo "Step 4: Removing Ingress from default namespace..."
 if kubectl get ingress opentelemetry-demo-ingress -n default &>/dev/null; then
     kubectl delete ingress opentelemetry-demo-ingress -n default 2>/dev/null || true
     print_status "Ingress removed from default namespace"
@@ -97,7 +120,7 @@ else
 fi
 
 # ============================================================================
-# 4. Remove cert-manager (optional)
+# 5. Remove cert-manager (optional)
 # ============================================================================
 echo ""
 read -p "Remove cert-manager? (y/N) " -n 1 -r
@@ -112,7 +135,7 @@ else
 fi
 
 # ============================================================================
-# 5. Remove NGINX Ingress Controller (optional)
+# 6. Remove NGINX Ingress Controller (optional)
 # ============================================================================
 echo ""
 read -p "Remove NGINX Ingress Controller? (y/N) " -n 1 -r
@@ -127,7 +150,7 @@ else
 fi
 
 # ============================================================================
-# 6. Remove ArgoCD (optional)
+# 7. Remove ArgoCD (optional)
 # ============================================================================
 echo ""
 read -p "Remove ArgoCD completely? (y/N) " -n 1 -r
