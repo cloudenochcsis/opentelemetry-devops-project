@@ -56,133 +56,94 @@ metadata:
   labels:
     opentelemetry.io/name: opentelemetry-demo-grafana
     app.kubernetes.io/instance: opentelemetry-demo
-      "schemaVersion": 40,
-      "tags": [
-        "opentelemetry",
-        "monitoring"
-      ],
-      "templating": {
-        "list": [
-          {
-            "current": {},
-            "includeAll": false,
-            "label": "Datasource",
-            "name": "datasource",
-            "options": [],
-            "query": "prometheus",
-            "refresh": 1,
-            "regex": "",
-            "type": "datasource"
-          }
-        ]
-      },
-      "time": {
-        "from": "now-6h",
-        "to": "now"
-      },
-      "timepicker": {},
-      "timezone": "utc",
-      "title": "OpenTelemetry Collector",
-      "uid": "BKf2sowmj",
-      "version": 1,
-      "weekStart": ""
-    }
-  spanmetrics-dashboard.json: |
+    app.kubernetes.io/component: grafana
+    app.kubernetes.io/name: opentelemetry-demo-grafana
+    app.kubernetes.io/part-of: opentelemetry-demo
+data:
+  kubernetes-overview.json: |
     {
-      "annotations": {
-        "list": [
-          {
-            "builtIn": 1,
-            "datasource": {
-              "type": "grafana",
-              "uid": "-- Grafana --"
-            },
-            "enable": true,
-            "hide": true,
-            "iconColor": "rgba(0, 211, 255, 1)",
-            "name": "Annotations & Alerts",
-            "target": {
-              "limit": 100,
-              "matchAny": false,
-              "tags": [],
-              "type": "dashboard"
-            },
-            "type": "dashboard"
-          }
-        ]
-      },
-      "description": "Spanmetrics way of demo application view.",
-      "editable": true,
-      "fiscalYearStartMonth": 0,
-      "graphTooltip": 0,
-      "id": 5,
-      "links": [],
-      "panels": [],
-      "preload": false,
-      "refresh": "5m",
-      "schemaVersion": 40,
-      "tags": [],
-      "templating": {
-        "list": [
-          {
-            "allValue": ".*",
-            "current": {
-              "text": "All",
-              "value": "$__all"
-            },
-            "datasource": {
-              "type": "prometheus",
-              "uid": "webstore-metrics"
-            },
-            "definition": "query_result(count by (service_name)(count_over_time(traces_span_metrics_calls_total[$__range])))",
-            "includeAll": true,
-            "multi": true,
-            "name": "service",
-            "options": [],
-            "query": {
-              "query": "query_result(count by (service_name)(count_over_time(traces_span_metrics_calls_total[$__range])))",
-              "refId": "StandardVariableQuery"
-            },
-            "refresh": 2,
-            "regex": "/.*service_name=\"(.*)\".*/",
-            "sort": 1,
-            "type": "query"
-          },
-          {
-            "allValue": ".*",
-            "current": {
-              "text": "All",
-              "value": "$__all"
-            },
-            "datasource": {
-              "type": "prometheus",
-              "uid": "webstore-metrics"
-            },
-            "definition": "query_result(sum ({__name__=~\".*traces_span_metrics_calls_total\",service_name=~\"$service\"})  by (span_name))",
-            "includeAll": true,
-            "multi": true,
-            "name": "span_name",
-            "options": [],
-            "query": {
-              "query": "query_result(sum ({__name__=~\".*traces_span_metrics_calls_total\",service_name=~\"$service\"})  by (span_name))",
-              "refId": "StandardVariableQuery"
-            },
-            "refresh": 2,
-            "regex": "/.*span_name=\"(.*)\".*/",
-            "type": "query"
-          }
-        ]
-      },
-      "time": {
-        "from": "now-1h",
-        "to": "now"
-      },
-      "timepicker": {},
-      "timezone": "",
-      "title": "Spanmetrics Demo Dashboard",
-      "uid": "W2gX2zHVk48",
+      "uid": "k8s-overview",
+      "title": "Kubernetes Overview",
+      "schemaVersion": 38,
       "version": 1,
-      "weekStart": ""
+      "refresh": "30s",
+      "time": {"from": "now-15m", "to": "now"},
+      "panels": [
+        {
+          "type": "timeseries",
+          "title": "Pod Count",
+          "datasource": {"type": "prometheus", "uid": "webstore-metrics"},
+          "targets": [
+            {"expr": "count(kube_pod_info)", "legendFormat": "pods"}
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+        },
+        {
+          "type": "timeseries",
+          "title": "Node CPU Utilization",
+          "datasource": {"type": "prometheus", "uid": "webstore-metrics"},
+          "targets": [
+            {"expr": "avg(rate(node_cpu_seconds_total{mode!=\"idle\"}[5m])) by (instance)", "legendFormat": "{{instance}}"}
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+        },
+        {
+          "type": "timeseries",
+          "title": "Deployment Replicas (Desired)",
+          "datasource": {"type": "prometheus", "uid": "webstore-metrics"},
+          "targets": [
+            {"expr": "sum(kube_deployment_spec_replicas) by (namespace)", "legendFormat": "{{namespace}}"}
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+        },
+        {
+          "type": "timeseries",
+          "title": "Node Memory Utilization",
+          "datasource": {"type": "prometheus", "uid": "webstore-metrics"},
+          "targets": [
+            {"expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes))", "legendFormat": "{{instance}}"}
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+        }
+      ]
+    }
+  kubernetes-pods.json: |
+    {
+      "uid": "k8s-pods",
+      "title": "Kubernetes Pods",
+      "schemaVersion": 38,
+      "version": 1,
+      "refresh": "30s",
+      "time": {"from": "now-15m", "to": "now"},
+      "panels": [
+        {
+          "type": "timeseries",
+          "title": "Pods by Phase",
+          "datasource": {"type": "prometheus", "uid": "webstore-metrics"},
+          "targets": [
+            {"expr": "sum(kube_pod_status_phase) by (phase)", "legendFormat": "{{phase}}"}
+          ],
+          "gridPos": {"h": 8, "w": 24, "x": 0, "y": 0}
+        },
+        {
+          "type": "timeseries",
+          "title": "Pod Restarts (15m)",
+          "datasource": {"type": "prometheus", "uid": "webstore-metrics"},
+          "targets": [
+            {"expr": "sum(increase(kube_pod_container_status_restarts_total[15m])) by (namespace)", "legendFormat": "{{namespace}}"}
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+        },
+        {
+          "type": "timeseries",
+          "title": "Deployment Replicas (Available)",
+          "datasource": {"type": "prometheus", "uid": "webstore-metrics"},
+          "targets": [
+            {"expr": "sum(kube_deployment_status_replicas_available) by (namespace)", "legendFormat": "{{namespace}}"}
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+        }
+      ]
     }
 ---
 apiVersion: apps/v1
