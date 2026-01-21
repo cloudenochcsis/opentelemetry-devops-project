@@ -32,13 +32,23 @@ data:
           insecure: true
       prometheusremotewrite:
         endpoint: http://opentelemetry-demo-prometheus-server:9090/api/v1/write
+        timeout: 30s
+        sending_queue:
+          enabled: true
+          num_consumers: 2
+          queue_size: 5000
+        retry_on_failure:
+          enabled: true
+          initial_interval: 5s
+          max_interval: 30s
+          max_elapsed_time: 5m
 
     processors:
       batch: {}
       memory_limiter:
         check_interval: 1s
-        limit_percentage: 80
-        spike_limit_percentage: 25
+        limit_percentage: 90
+        spike_limit_percentage: 30
 
     connectors:
       spanmetrics: {}
@@ -103,10 +113,10 @@ spec:
               mountPath: /conf
           resources:
             limits:
-              memory: 512Mi
+              memory: 1Gi
               cpu: 500m
             requests:
-              memory: 200Mi
+              memory: 300Mi
               cpu: 100m
       volumes:
         - name: config
