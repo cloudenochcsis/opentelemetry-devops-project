@@ -2179,8 +2179,8 @@ data:
       batch: {}
       memory_limiter:
         check_interval: 1s
-        limit_percentage: 65
-        spike_limit_percentage: 20
+        limit_percentage: 80
+        spike_limit_percentage: 25
 
     connectors:
       spanmetrics: {}
@@ -2244,10 +2244,10 @@ spec:
               mountPath: /conf
           resources:
             limits:
-              memory: 200Mi
+              memory: 512Mi
               cpu: 500m
             requests:
-              memory: 100Mi
+              memory: 200Mi
               cpu: 100m
       volumes:
         - name: config
@@ -2445,6 +2445,7 @@ spec:
           args:
             - --config.file=/etc/prometheus/prometheus.yml
             - --storage.tsdb.path=/prometheus
+            - --storage.tsdb.out-of-order-time-window=5m
             - --web.console.libraries=/usr/share/prometheus/console_libraries
             - --web.console.templates=/usr/share/prometheus/consoles
             - --web.enable-remote-write-receiver
