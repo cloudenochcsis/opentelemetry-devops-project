@@ -1,0 +1,36 @@
+name: auto-merge-test-branch
+
+on:
+  push:
+    branches:
+      - test/trigger-ci-workflow
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  open-or-update-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create or update PR and enable auto-merge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          BASE="main"
+          HEAD="test/trigger-ci-workflow"
+
+          PR_NUMBER=$(gh pr list --base "$BASE" --head "$HEAD" --state open --json number -q '.[0].number')
+
+          if [ -z "$PR_NUMBER" ]; then
+            PR_URL=$(gh pr create \
+              --base "$BASE" \
+              --head "$HEAD" \
+              --title "Auto-merge: sync test/trigger-ci-workflow" \
+              --body "Automated PR from test/trigger-ci-workflow. Merges only after required checks pass.")
+            PR_NUMBER=$(echo "$PR_URL" | awk -F/ '{print $NF}')
+          fi
+
+          gh pr merge "$PR_NUMBER" --auto --merge
