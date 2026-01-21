@@ -170,21 +170,6 @@ spec:
         app.kubernetes.io/name: opentelemetry-demo-grafana
     spec:
       serviceAccountName: opentelemetry-demo
-      initContainers:
-        - name: demo-dashboards
-          image: curlimages/curl:8.10.1
-          command:
-            - /bin/sh
-            - -c
-            - >
-              set -e;
-              mkdir -p /dashboards/demo;
-              for f in demo-dashboard.json exemplars-dashboard.json opentelemetry-collector-data-flow.json opentelemetry-collector.json spanmetrics-dashboard.json; do
-                curl -fsSL https://raw.githubusercontent.com/open-telemetry/opentelemetry-demo/main/src/grafana/provisioning/dashboards/demo/$f -o /dashboards/demo/$f;
-              done
-          volumeMounts:
-            - name: demo-dashboards
-              mountPath: /dashboards
       containers:
         - name: grafana
           image: grafana/grafana:10.3.1
@@ -240,4 +225,5 @@ spec:
           configMap:
             name: opentelemetry-demo-grafana-dashboards
         - name: demo-dashboards
-          emptyDir: {}
+          configMap:
+            name: opentelemetry-demo-grafana-demo-dashboards
