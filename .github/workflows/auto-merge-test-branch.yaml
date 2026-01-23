@@ -16,7 +16,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Create or update PR and enable auto-merge
+      - name: Create or update PR (auto-merge disabled)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -56,4 +56,4 @@ jobs:
             exit 1
           fi
 
-          gh pr merge "$PR_NUMBER" --auto --merge
+          echo "Auto-merge is currently disabled."
