@@ -1,9 +1,7 @@
 name: auto-merge-test-branch
 
 on:
-  push:
-    branches:
-      - test/trigger-ci-workflow
+  workflow_dispatch:
 
 permissions:
   contents: write
