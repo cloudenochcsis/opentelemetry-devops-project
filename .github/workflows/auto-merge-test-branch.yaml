@@ -36,4 +36,24 @@ jobs:
             PR_NUMBER=$(echo "$PR_URL" | awk -F/ '{print $NF}')
           fi
 
+          # Wait until GitHub calculates mergeability to avoid unstable status
+          echo "Waiting for PR #$PR_NUMBER to become mergeable..."
+          for i in {1..30}; do
+            MERGEABLE=$(gh pr view "$PR_NUMBER" --json mergeable,isDraft -q '.mergeable')
+            IS_DRAFT=$(gh pr view "$PR_NUMBER" --json isDraft -q '.isDraft')
+            if [ "$IS_DRAFT" = "true" ]; then
+              echo "PR #$PR_NUMBER is a draft. Skipping auto-merge."
+              exit 0
+            fi
+            if [ "$MERGEABLE" = "MERGEABLE" ] || [ "$MERGEABLE" = "CONFLICTING" ]; then
+              break
+            fi
+            sleep 5
+          done
+
+          if [ "$MERGEABLE" = "CONFLICTING" ]; then
+            echo "PR #$PR_NUMBER has conflicts."
+            exit 1
+          fi
+
           gh pr merge "$PR_NUMBER" --auto --merge
