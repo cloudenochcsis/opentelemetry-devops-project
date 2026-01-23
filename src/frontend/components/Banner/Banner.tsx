@@ -11,8 +11,8 @@ const Banner = () => {
         <S.BannerImg />
       </S.ImageContainer>
       <S.TextContainer>
-        <S.Title>The best telescopes to see the whole world closer</S.Title>
-        <Link href="#hot-products"><S.GoShoppingButton> Go Shopping</S.GoShoppingButton></Link>
+        <S.Title>I am interviewing for the role of a DevOps Engineer at Tether</S.Title>
+        <Link href="#hot-products"><S.GoShoppingButton> This is my demo to showcase my skills</S.GoShoppingButton></Link>
       </S.TextContainer>
     </S.Banner>
   );
