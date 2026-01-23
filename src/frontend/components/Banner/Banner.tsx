@@ -12,7 +12,7 @@ const Banner = () => {
       </S.ImageContainer>
       <S.TextContainer>
         <S.Title>The best telescopes to see the whole world closer</S.Title>
-        <Link href="#hot-products"><S.GoShoppingButton>Go Shopping</S.GoShoppingButton></Link>
+        <Link href="#hot-products"><S.GoShoppingButton>DevOps Shopping</S.GoShoppingButton></Link>
       </S.TextContainer>
     </S.Banner>
   );
